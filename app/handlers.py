@@ -43,14 +43,14 @@ async def cmd_help(message: Message):
 
 
 @router.callback_query(F.data == 'search')
-async def new_page(callback: CallbackQuery, state: FSMContext):
+async def search(callback: CallbackQuery, state: FSMContext):
     await callback.answer('Для поиска в «Книге памяти» введите фамилию')
     await state.set_state(Search.surname)
     await callback.message.answer('Введите фамилию:')
 
 
 @router.message(Search.surname)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_search(message: Message, state: FSMContext):
     await state.update_data(surname=message.text)
     for_search = await state.get_data()
     async with async_session() as session:
@@ -81,21 +81,21 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
 
 
 @router.message(New_Page.name)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(New_Page.patronymic)
     await message.answer("Введите отчество:")
 
 
 @router.message(New_Page.patronymic)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_patronymic(message: Message, state: FSMContext):
     await state.update_data(patronymic=message.text)
     await state.set_state(New_Page.birthday)
     await message.answer("Введите дату рождения (ДД.ММ.ГГГГ):")
 
 
 @router.message(New_Page.birthday)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_birthday(message: Message, state: FSMContext):
     await state.update_data(birthday=message.text)
     for_check = await state.get_data()
     async with async_session() as session:
@@ -112,35 +112,35 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
 
 
 @router.message(New_Page.birthplace)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_birthplace(message: Message, state: FSMContext):
     await state.update_data(birthplace=message.text)
     await state.set_state(New_Page.death_date)
     await message.answer("Введите дату смерти (ДД.ММ.ГГГГ):")
 
 
 @router.message(New_Page.death_date)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_death_date(message: Message, state: FSMContext):
     await state.update_data(death_date=message.text)
     await state.set_state(New_Page.death_place)
     await message.answer("Введите место смерти:")
 
 
 @router.message(New_Page.death_place)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_death_place(message: Message, state: FSMContext):
     await state.update_data(death_place=message.text)
     await state.set_state(New_Page.biography)
     await message.answer("Введите биографию:")
 
 
 @router.message(New_Page.biography)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_biography(message: Message, state: FSMContext):
     await state.update_data(biography=message.text)
     await state.set_state(New_Page.obit)
     await message.answer("Введите эпитафию:")
 
 
 @router.message(New_Page.obit)
-async def cmd_new_page_surname(message: Message, state: FSMContext):
+async def cmd_new_page_obit(message: Message, state: FSMContext):
     await state.update_data(obit=message.text)
     page = await state.get_data()
     async with async_session() as session:
