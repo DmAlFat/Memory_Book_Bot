@@ -1,11 +1,9 @@
 from aiogram import Router, F
-
 from aiogram.types import Message, CallbackQuery
-
 from aiogram.filters import CommandStart, Command
-
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+
 from sqlalchemy import select
 
 from app.keyboards import option_kb

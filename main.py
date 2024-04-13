@@ -1,7 +1,6 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
-
 from aiogram.methods import DeleteWebhook
 
 from config import TOKEN_API
