@@ -1,1 +1,1 @@
-TOKEN_API = "6405192476:AAFA-2o2Be9oJ8NeJ0010_KRMx9ZOnESof0"
+TOKEN_API = "Get your Token from https://t.me/BotFather"

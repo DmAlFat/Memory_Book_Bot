@@ -1,11 +1,15 @@
 from aiogram import Router, F
+
 from aiogram.types import Message, CallbackQuery
+
 from aiogram.filters import CommandStart, Command
+
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import select
 
 from app.keyboards import option_kb
+
 from database.models import async_session, Page
 
 router = Router()
@@ -29,20 +33,20 @@ class Search(StatesGroup):
 
 @router.message(CommandStart())
 async def welcome(message: Message):
-    await message.answer(text='Добро пожаловать в телеграм-бот проекта «Код Памяти»!',
+    await message.answer(text='Добро пожаловать в телеграм-бот «Книга памяти»!',
                          reply_markup=option_kb)
 
 
 @router.message(Command('help'))
 async def cmd_help(message: Message):
-    help_txt = """Данный телеграм-бот предназначен для быстрого и удобного заполнения данных для проекта «Код Памяти»\n
+    help_txt = """Данный телеграм-бот предназначен для хранения, добавления и поиска информации о людях\n
 Для запуска бота отправьте команду - '/start' """
     await message.answer(text=help_txt)
 
 
 @router.callback_query(F.data == 'search')
 async def new_page(callback: CallbackQuery, state: FSMContext):
-    await callback.answer('Для поиска "страницы памяти" введите фамилию.')
+    await callback.answer('Для поиска в «Книге памяти» введите фамилию')
     await state.set_state(Search.surname)
     await callback.message.answer('Введите фамилию:')
 
@@ -55,18 +59,18 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
         in_page = await session.execute(select(Page).where(Page.surname == for_search["surname"]))
         res = in_page.all()
         if not res:
-            await message.answer('Такой "страницы памяти" пока не существует!', reply_markup=option_kb)
+            await message.answer('Такой страницы пока не существует!', reply_markup=option_kb)
         else:
             for i in res:
                 for j in i:
                     await message.answer(f'{j}')
-            await message.answer(f'Найдено "страниц памяти": {len(res)}', reply_markup=option_kb)
+            await message.answer(f'Найдено страниц: {len(res)}', reply_markup=option_kb)
     await state.clear()
 
 
 @router.callback_query(F.data == 'new_page')
 async def new_page(callback: CallbackQuery, state: FSMContext):
-    await callback.answer('Вы приступаете к заполнению новой "страницы памяти"!')
+    await callback.answer('Вы приступаете к заполнению новой страницы в «Книге памяти»!')
     await state.set_state(New_Page.surname)
     await callback.message.answer('Введите фамилию:')
 
@@ -89,7 +93,7 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
 async def cmd_new_page_surname(message: Message, state: FSMContext):
     await state.update_data(patronymic=message.text)
     await state.set_state(New_Page.birthday)
-    await message.answer("Введите дату рождения:")
+    await message.answer("Введите дату рождения (ДД.ММ.ГГГГ):")
 
 
 @router.message(New_Page.birthday)
@@ -102,7 +106,7 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
                                                            Page.patronymic == for_check["patronymic"],
                                                            Page.birthday == for_check["birthday"]))
         if checking is not None:
-            await message.answer('Такая "страница памяти" уже существует!', reply_markup=option_kb)
+            await message.answer('Такая страница уже существует!', reply_markup=option_kb)
             await state.clear()
         else:
             await state.set_state(New_Page.birthplace)
@@ -113,7 +117,7 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
 async def cmd_new_page_surname(message: Message, state: FSMContext):
     await state.update_data(birthplace=message.text)
     await state.set_state(New_Page.death_date)
-    await message.answer("Введите дату смерти:")
+    await message.answer("Введите дату смерти (ДД.ММ.ГГГГ):")
 
 
 @router.message(New_Page.death_date)
@@ -157,7 +161,8 @@ async def cmd_new_page_surname(message: Message, state: FSMContext):
                              biography=page["biography"],
                              obit=page["obit"]))
             await session.commit()
-            await message.answer('"Страница памяти" успешно добавлена!', reply_markup=option_kb)
+            await message.answer('Страница успешно добавлена!', reply_markup=option_kb)
         else:
-            await message.answer('Такая "страница памяти" уже существует!', reply_markup=option_kb)
+            await message.answer('Кто-то опередил Вас при создании страницы! Воспользуйтесь поиском по «Книге памяти»',
+                                 reply_markup=option_kb)
     await state.clear()
